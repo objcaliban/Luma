@@ -1,0 +1,40 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Xcode
+build/
+DerivedData/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+*.dSYM
+*.dSYM.zip
+*.xcscmblueprint
+xcuserdata/
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Environment & Secrets
+.env
+.env.*
+secrets.xcconfig
+APIKeys.swift
+
+# Misc
+*.log
+*.tmp
+*.swp
+*~
