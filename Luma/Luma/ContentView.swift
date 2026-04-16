@@ -95,13 +95,22 @@ struct ContentView: View {
                 .onSubmit { sendMessage() }
                 .disabled(!isReady)
 
-            Button(action: sendMessage) {
-                Image(systemName: "arrow.up.circle.fill")
-                    .font(.title2)
+            if viewModel.isGenerating {
+                Button(action: { viewModel.cancelGeneration() }) {
+                    Image(systemName: "stop.circle.fill")
+                        .font(.title2)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.red)
+            } else {
+                Button(action: sendMessage) {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.title2)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(canSend ? .primary : .secondary)
+                .disabled(!canSend)
             }
-            .buttonStyle(.plain)
-            .foregroundStyle(canSend ? .primary : .secondary)
-            .disabled(!canSend)
         }
         .padding(12)
     }
@@ -117,6 +126,6 @@ struct ContentView: View {
 
     private func sendMessage() {
         guard canSend else { return }
-        Task { await viewModel.send() }
+        viewModel.sendMessage()
     }
 }
