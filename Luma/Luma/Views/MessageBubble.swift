@@ -7,7 +7,11 @@ struct MessageBubble: View {
     private var isUser: Bool { message.role == .user }
 
     private var markdownContent: AttributedString {
-        (try? AttributedString(markdown: message.content)) ?? AttributedString(message.content)
+        let options = AttributedString.MarkdownParsingOptions(
+            interpretedSyntax: .inlineOnlyPreservingWhitespace
+        )
+        return (try? AttributedString(markdown: message.content, options: options))
+            ?? AttributedString(message.content)
     }
 
     var body: some View {
@@ -15,6 +19,7 @@ struct MessageBubble: View {
             if isUser { Spacer(minLength: 60) }
 
             Text(markdownContent)
+                .textSelection(.enabled)
                 .padding(12)
                 .background(isUser ? Color.accentColor : Color(.secondarySystemFill))
                 .foregroundStyle(isUser ? .white : .primary)

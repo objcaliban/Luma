@@ -1,7 +1,7 @@
 import SwiftUI
 import LLMKit
 
-struct ContentView: View {
+struct ChatView: View {
     @Bindable var viewModel: ChatViewModel
 
     var body: some View {
@@ -55,6 +55,8 @@ struct ContentView: View {
         .frame(height: 30)
     }
 
+    /// - Note - possible improvement: add auto-scroll to the latest message on content updates;
+    ///   simplified given the scope of the task
     private var messageList: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -93,7 +95,7 @@ struct ContentView: View {
             TextField("Message...", text: $viewModel.inputText)
                 .textFieldStyle(.plain)
                 .onSubmit { sendMessage() }
-                .disabled(!isReady)
+                .disabled(!viewModel.isReady)
 
             if viewModel.isGenerating {
                 Button(action: { viewModel.cancelGeneration() }) {
@@ -108,24 +110,15 @@ struct ContentView: View {
                         .font(.title2)
                 }
                 .buttonStyle(.plain)
-                .foregroundStyle(canSend ? .primary : .secondary)
-                .disabled(!canSend)
+                .foregroundStyle(viewModel.canSend ? .primary : .secondary)
+                .disabled(!viewModel.canSend)
             }
         }
         .padding(12)
     }
 
-    private var isReady: Bool {
-        if case .ready = viewModel.modelState { return true }
-        return false
-    }
-
-    private var canSend: Bool {
-        isReady && !viewModel.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !viewModel.isGenerating
-    }
-
     private func sendMessage() {
-        guard canSend else { return }
+        guard viewModel.canSend else { return }
         viewModel.sendMessage()
     }
 }

@@ -9,6 +9,15 @@ final class ChatViewModel {
     @MainActor private(set) var modelState: ModelState = .idle
     @MainActor private(set) var isGenerating = false
 
+    @MainActor var isReady: Bool {
+        if case .ready = modelState { return true }
+        return false
+    }
+
+    @MainActor var canSend: Bool {
+        isReady && !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isGenerating
+    }
+
     private let factory: LLMKitFactory
     private var provider: (any ModelProvider)?
     private var chatService: (any ChatService)?
@@ -21,9 +30,10 @@ final class ChatViewModel {
     }
 
     func loadModel() async {
-        guard await modelState.canAttemptLoading else { return }
-
-        await MainActor.run { modelState = .downloading }
+        await MainActor.run {
+            guard modelState.canAttemptLoading else { return }
+            modelState = .downloading
+        }
         let provider = factory.makeModelProvider()
         self.provider = provider
 
@@ -33,8 +43,8 @@ final class ChatViewModel {
             let service = try await factory.makeChatService(provider: provider)
             await MainActor.run {
                 modelState = state
-                chatService = service
             }
+            chatService = service
         } catch {
             await MainActor.run { modelState = .failed(error) }
         }
@@ -75,7 +85,8 @@ final class ChatViewModel {
 
         var chunks: [String] = []
         do {
-            let stream = try await chatService.sendStreaming(messages)
+            let snapshot = await MainActor.run { messages }
+            let stream = try await chatService.sendStreaming(snapshot)
             for await chunk in stream {
                 try Task.checkCancellation()
                 chunks.append(chunk)
@@ -84,11 +95,10 @@ final class ChatViewModel {
                     updateMessage(id: responseID, content: accumulated, timestamp: responseTimestamp)
                 }
             }
-        } catch is CancellationError {
-            // Generation was cancelled by the user
         } catch {
             if chunks.isEmpty {
                 await MainActor.run {
+                    ///   simplified given the scope of the task
                     updateMessage(id: responseID, content: "Error: \(error.localizedDescription)", timestamp: responseTimestamp)
                 }
             }
