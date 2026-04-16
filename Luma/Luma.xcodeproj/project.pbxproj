@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B6D6494A2F8FE5F9000FB464 /* LLMKit in Frameworks */ = {isa = PBXBuildFile; productRef = B6D649492F8FE5F9000FB464 /* LLMKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		B6B8DACB2F8FC6FA0083B83C /* Luma.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Luma.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,16 +27,25 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6D6494A2F8FE5F9000FB464 /* LLMKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B6140BF52F8FDCCE00A51757 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		B6B8DAC22F8FC6FA0083B83C = {
 			isa = PBXGroup;
 			children = (
 				B6B8DACD2F8FC6FA0083B83C /* Luma */,
+				B6140BF52F8FDCCE00A51757 /* Frameworks */,
 				B6B8DACC2F8FC6FA0083B83C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,6 +78,7 @@
 			);
 			name = Luma;
 			packageProductDependencies = (
+				B6D649492F8FE5F9000FB464 /* LLMKit */,
 			);
 			productName = Luma;
 			productReference = B6B8DACB2F8FC6FA0083B83C /* Luma.app */;
@@ -94,6 +108,9 @@
 			);
 			mainGroup = B6B8DAC22F8FC6FA0083B83C;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B6D649482F8FE5F9000FB464 /* XCLocalSwiftPackageReference "../LLMKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B6B8DACC2F8FC6FA0083B83C /* Products */;
 			projectDirPath = "";
@@ -251,9 +268,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -281,9 +297,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -325,6 +340,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		B6D649482F8FE5F9000FB464 /* XCLocalSwiftPackageReference "../LLMKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../LLMKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B6D649492F8FE5F9000FB464 /* LLMKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LLMKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B6B8DAC32F8FC6FA0083B83C /* Project object */;
 }

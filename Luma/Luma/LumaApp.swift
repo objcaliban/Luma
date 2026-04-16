@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct LumaApp: App {
+    @State private var viewModel = ChatViewModel()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(viewModel: viewModel)
         }
     }
 }
