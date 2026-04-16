@@ -1,14 +1,7 @@
 /// The single entry point for creating LLMKit services.
 ///
-/// Assembles internal dependencies and returns only protocol types,
-/// keeping all concrete implementations hidden from the main app.
-///
-/// ```swift
-/// let factory = LLMKitFactory()
-/// let provider = factory.makeModelProvider()
-/// try await provider.load()
-/// let chat = await factory.makeChatService(provider: provider)
-/// ```
+/// - Note - possible improvement: extract a protocol for `LLMKitFactory` if multiple implementations are needed;
+///   omitted for simplicity given the scope of the task
 public struct LLMKitFactory: Sendable {
 
     private let modelID: String
@@ -21,6 +14,7 @@ public struct LLMKitFactory: Sendable {
     ///     Defaults to Llama 3.2 1B Instruct (4-bit quantized).
     ///   - maxTokens: Maximum number of tokens per response.
     public init(
+        /// - Note - possible improvement: move modelID to some local or remote configuration
         modelID: String = "mlx-community/Llama-3.2-1B-Instruct-4bit",
         maxTokens: Int = 512
     ) {
@@ -49,6 +43,8 @@ public struct LLMKitFactory: Sendable {
             throw LLMKitError.modelNotReady
         }
 
+        /// - Note - possible improvement: inject formatter and generator via init for testability and flexibility,
+        ///   depending on the desired API architecture
         let formatter = ChatPromptFormatter()
         let generator = MLXTextGenerator()
 

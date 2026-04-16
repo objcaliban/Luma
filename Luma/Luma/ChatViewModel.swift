@@ -3,19 +3,26 @@ import LLMKit
 
 @Observable
 final class ChatViewModel {
+    var inputText = ""
+    
     private(set) var messages: [ChatMessage] = []
     private(set) var modelState: ModelState = .idle
     private(set) var isGenerating = false
 
-    var inputText = ""
-
-    private let factory = LLMKitFactory()
+    private let factory: LLMKitFactory
     private var provider: (any ModelProvider)?
     private var chatService: (any ChatService)?
 
-    func loadModel() async {
-        if case .ready = modelState { return }
+    /// - Note - possible improvement: accept a protocol instead of a concrete type for full testability;
+    ///   simplified given the scope of the task
+    init(factory: LLMKitFactory = LLMKitFactory()) {
+        self.factory = factory
+    }
 
+    func loadModel() async {
+        guard modelState.canAttemptLoading else { return }
+
+        modelState = .downloading
         let provider = factory.makeModelProvider()
         self.provider = provider
 
@@ -28,31 +35,39 @@ final class ChatViewModel {
         }
     }
 
-    func refreshModelState() async {
-        guard let provider else { return }
-        modelState = await provider.state
-    }
-
     func send() async {
+        guard !isGenerating else { return }
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty, let chatService else { return }
 
         inputText = ""
-        messages.append(ChatMessage(role: .user, content: text))
-        messages.append(ChatMessage(role: .assistant, content: ""))
+        let userMessage = ChatMessage(role: .user, content: text)
+        messages.append(userMessage)
+
+        let responseID = UUID()
+        let responseTimestamp = Date()
+        messages.append(ChatMessage(role: .assistant, content: "", id: responseID, timestamp: responseTimestamp))
         isGenerating = true
 
+        var chunks: [String] = []
         do {
-            let stream = try await chatService.sendStreaming(text)
-            for try await chunk in stream {
-                messages[messages.count - 1].content += chunk
+            let stream = try await chatService.sendStreaming(messages)
+            for await chunk in stream {
+                chunks.append(chunk)
+                let accumulated = chunks.joined()
+                updateMessage(id: responseID, content: accumulated, timestamp: responseTimestamp)
             }
         } catch {
-            if messages[messages.count - 1].content.isEmpty {
-                messages[messages.count - 1].content = "Error: \(error.localizedDescription)"
+            if chunks.isEmpty {
+                updateMessage(id: responseID, content: "Error: \(error.localizedDescription)", timestamp: responseTimestamp)
             }
         }
 
         isGenerating = false
+    }
+
+    private func updateMessage(id: UUID, content: String, timestamp: Date) {
+        guard let index = messages.firstIndex(where: { $0.id == id }) else { return }
+        messages[index] = ChatMessage(role: .assistant, content: content, id: id, timestamp: timestamp)
     }
 }

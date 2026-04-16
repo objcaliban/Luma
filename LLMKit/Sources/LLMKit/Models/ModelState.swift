@@ -12,4 +12,12 @@ public enum ModelState: Sendable {
 
     /// The model failed to load.
     case failed(Error)
+
+    /// Whether a load attempt is allowed from this state.
+    public var canAttemptLoading: Bool {
+        switch self {
+        case .idle, .failed: true
+        case .downloading, .ready: false
+        }
+    }
 }
