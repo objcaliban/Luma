@@ -16,14 +16,8 @@ struct HuggingFaceModelLoader: ModelLoading {
         self.modelID = modelID
     }
 
-    func load(onProgress: @Sendable @escaping (Double) -> Void) async throws -> ModelContainer {
+    func load() async throws -> ModelContainer {
         let configuration = ModelConfiguration(id: modelID)
-        // LLMModelFactory.shared is the library-provided entry point in mlx-swift-lm v2.
-        // We cannot avoid it — it is the only public API for loading models.
-        return try await LLMModelFactory.shared.loadContainer(
-            configuration: configuration
-        ) { progress in
-            onProgress(progress.fractionCompleted)
-        }
+        return try await LLMModelFactory.shared.loadContainer(configuration: configuration)
     }
 }

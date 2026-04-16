@@ -12,29 +12,6 @@ let package = Package(
             targets: ["LLMKit"]
         ),
     ],
-//    dependencies: [
-//        // Core LLM library
-//        .package(url: "https://github.com/ml-explore/mlx-swift-lm", branch: "main"),
-//        // Tokenizer adapter
-//        .package(url: "https://github.com/DePasqualeOrg/swift-tokenizers-mlx", from: "0.1.0"),
-//        // Hugging Face downloader adapter (for downloading models)
-//        .package(url: "https://github.com/DePasqualeOrg/swift-hf-api-mlx", from: "0.1.0"),
-//    ],
-//    dependencies: [
-//        .package(url: "https://github.com/ml-explore/mlx-swift-lm", branch: "main"),
-//        .package(url: "https://github.com/DePasqualeOrg/swift-tokenizers-mlx", branch: "main"),
-//        .package(url: "https://github.com/DePasqualeOrg/swift-hf-api-mlx", branch: "main"),
-//    ],
-//    targets: [
-//        .target(
-//            name: "LLMKit",
-//            dependencies: [
-//                .product(name: "MLXLLM", package: "mlx-swift-lm"),
-//                .product(name: "MLXLMTokenizers", package: "swift-tokenizers-mlx"),
-//                .product(name: "MLXLMHuggingFace", package: "swift-hf-api-mlx"),
-//            ]
-//        ),
-//    ],
     dependencies: [
         .package(url: "https://github.com/ml-explore/mlx-swift-lm", from: "2.30.0"),
     ],

@@ -10,7 +10,7 @@ public struct ChatMessage: Identifiable, Sendable {
     public let role: Role
 
     /// The text content of the message.
-    public var content: String
+    public let content: String
 
     /// The time the message was created.
     public let timestamp: Date

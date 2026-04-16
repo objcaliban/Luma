@@ -4,8 +4,8 @@ public enum ModelState: Sendable {
     /// The model has not been loaded yet.
     case idle
 
-    /// The model is being downloaded. `progress` is a value from 0.0 to 1.0.
-    case downloading(progress: Double)
+    /// The model is being downloaded.
+    case downloading
 
     /// The model is loaded into memory and ready for inference.
     case ready

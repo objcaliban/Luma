@@ -19,41 +19,19 @@ struct MLXTextGenerator: TextGenerating {
         self.topP = topP
     }
 
-    func generate(
-        from messages: [[String: String]],
-        using container: ModelContainer,
-        maxTokens: Int
-    ) async throws -> String {
-        let input = try await container.perform { context in
-            try await context.processor.prepare(input: .init(messages: messages))
-        }
-
-        let result = try await container.perform { context in
-            try MLXLMCommon.generate(
-                input: input,
-                parameters: .init(temperature: temperature, topP: topP),
-                context: context
-            ) { tokens in
-                tokens.count >= maxTokens ? .stop : .more
-            }
-        }
-
-        return result.output
-    }
-
     func generateStream(
-        from messages: [[String: String]],
+        from messages: [FormattedMessage],
         using container: ModelContainer,
         maxTokens: Int
-    ) async throws -> AsyncThrowingStream<String, Error> {
+    ) async throws -> AsyncStream<String> {
         let input = try await container.perform { context in
-            try await context.processor.prepare(input: .init(messages: messages))
+            try await context.processor.prepare(input: .init(messages: messages.map(\.asDictionary)))
         }
 
         let parameters = GenerateParameters(maxTokens: maxTokens, temperature: temperature, topP: topP)
         let stream = try await container.generate(input: input, parameters: parameters)
 
-        return AsyncThrowingStream { continuation in
+        return AsyncStream { continuation in
             Task {
                 for await generation in stream {
                     if let chunk = generation.chunk {

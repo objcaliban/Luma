@@ -12,7 +12,6 @@
 public struct LLMKitFactory: Sendable {
 
     private let modelID: String
-    private let systemPrompt: String
     private let maxTokens: Int
 
     /// Creates a factory configured for a specific model.
@@ -20,15 +19,12 @@ public struct LLMKitFactory: Sendable {
     /// - Parameters:
     ///   - modelID: The Hugging Face model identifier.
     ///     Defaults to Llama 3.2 1B Instruct (4-bit quantized).
-    ///   - systemPrompt: Instructions that define the assistant's behavior.
     ///   - maxTokens: Maximum number of tokens per response.
     public init(
         modelID: String = "mlx-community/Llama-3.2-1B-Instruct-4bit",
-        systemPrompt: String = "You are a helpful assistant.",
         maxTokens: Int = 512
     ) {
         self.modelID = modelID
-        self.systemPrompt = systemPrompt
         self.maxTokens = maxTokens
     }
 
@@ -37,7 +33,7 @@ public struct LLMKitFactory: Sendable {
     /// - Returns: A ``ModelProvider`` ready to begin loading.
     public func makeModelProvider() -> any ModelProvider {
         let loader = HuggingFaceModelLoader(modelID: modelID)
-        return DefaultModelProvider(loader: loader)
+        return MLXModelProvider(loader: loader)
     }
 
     /// Creates a chat service using a loaded model provider.
@@ -49,15 +45,14 @@ public struct LLMKitFactory: Sendable {
     /// - Returns: A ``ChatService`` ready to accept messages.
     /// - Throws: ``LLMKitError/modelNotReady`` if the provider has no loaded model.
     public func makeChatService(provider: any ModelProvider) async throws -> any ChatService {
-        guard let defaultProvider = provider as? DefaultModelProvider,
-              let container = await defaultProvider.modelContainer else {
+        guard let container = await provider.modelContainer else {
             throw LLMKitError.modelNotReady
         }
 
-        let formatter = LlamaPromptFormatter(systemPrompt: systemPrompt)
+        let formatter = ChatPromptFormatter()
         let generator = MLXTextGenerator()
 
-        return DefaultChatService(
+        return MLXChatService(
             formatter: formatter,
             generator: generator,
             container: container,
