@@ -50,4 +50,38 @@ actor DefaultChatService: ChatService {
 
         return assistantMessage
     }
+
+    func sendStreaming(_ message: String) async throws -> AsyncThrowingStream<String, Error> {
+        let userMessage = ChatMessage(role: .user, content: message)
+        messages.append(userMessage)
+
+        let formatted = formatter.format(messages)
+        let innerStream = try await generator.generateStream(
+            from: formatted,
+            using: container,
+            maxTokens: maxTokens
+        )
+
+        // Wrap to capture the full response for history once streaming completes
+        return AsyncThrowingStream { [weak self] continuation in
+            Task { [weak self] in
+                var fullResponse = ""
+                do {
+                    for try await chunk in innerStream {
+                        fullResponse += chunk
+                        continuation.yield(chunk)
+                    }
+                    await self?.appendAssistantMessage(fullResponse)
+                    continuation.finish()
+                } catch {
+                    await self?.appendAssistantMessage(fullResponse)
+                    continuation.finish(throwing: error)
+                }
+            }
+        }
+    }
+
+    private func appendAssistantMessage(_ content: String) {
+        messages.append(ChatMessage(role: .assistant, content: content))
+    }
 }

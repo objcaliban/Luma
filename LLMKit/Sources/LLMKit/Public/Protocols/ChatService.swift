@@ -16,6 +16,12 @@ public protocol ChatService: Sendable {
     /// - Throws: An error if inference fails.
     func send(_ message: String) async throws -> ChatMessage
 
+    /// Sends a user message and returns a stream of text chunks.
+    ///
+    /// - Parameter message: The user's input text.
+    /// - Returns: An async stream of generated text chunks.
+    func sendStreaming(_ message: String) async throws -> AsyncThrowingStream<String, Error>
+
     /// The full conversation history, ordered chronologically.
     var history: [ChatMessage] { get async }
 }

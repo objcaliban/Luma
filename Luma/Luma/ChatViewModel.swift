@@ -39,15 +39,18 @@ final class ChatViewModel {
 
         inputText = ""
         messages.append(ChatMessage(role: .user, content: text))
+        messages.append(ChatMessage(role: .assistant, content: ""))
         isGenerating = true
 
         do {
-            let response = try await chatService.send(text)
-            // Replace history with service's version to stay in sync
-            messages = await chatService.history
-            _ = response // response is already in history
+            let stream = try await chatService.sendStreaming(text)
+            for try await chunk in stream {
+                messages[messages.count - 1].content += chunk
+            }
         } catch {
-            messages.append(ChatMessage(role: .assistant, content: "Error: \(error.localizedDescription)"))
+            if messages[messages.count - 1].content.isEmpty {
+                messages[messages.count - 1].content = "Error: \(error.localizedDescription)"
+            }
         }
 
         isGenerating = false

@@ -40,4 +40,28 @@ struct MLXTextGenerator: TextGenerating {
 
         return result.output
     }
+
+    func generateStream(
+        from messages: [[String: String]],
+        using container: ModelContainer,
+        maxTokens: Int
+    ) async throws -> AsyncThrowingStream<String, Error> {
+        let input = try await container.perform { context in
+            try await context.processor.prepare(input: .init(messages: messages))
+        }
+
+        let parameters = GenerateParameters(maxTokens: maxTokens, temperature: temperature, topP: topP)
+        let stream = try await container.generate(input: input, parameters: parameters)
+
+        return AsyncThrowingStream { continuation in
+            Task {
+                for await generation in stream {
+                    if let chunk = generation.chunk {
+                        continuation.yield(chunk)
+                    }
+                }
+                continuation.finish()
+            }
+        }
+    }
 }
