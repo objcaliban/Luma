@@ -33,6 +33,12 @@ The project is split into two modules:
 
 On the first launch the app will download the Llama 3.2 1B model (~700 MB). Subsequent launches load from the local cache and are much faster.
 
+## Requirements
+
+- macOS 26+
+- Xcode 26+
+- Swift 6+
+
 ## Testing
 
 The project currently does not include a test target.
